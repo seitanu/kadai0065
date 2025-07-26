@@ -136,7 +136,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11177f2edb50143449c9af464d93620b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  reactionDuration: 0.5
-  shakeIntensity: 0.2
-  normalMaterial: {fileID: 2100000, guid: 215afe3133862324ca502bdc22cbe671, type: 2}
-  hitMaterial: {fileID: 2100000, guid: 25c17f8765aad7b4898c538e2cfd61c0, type: 2}

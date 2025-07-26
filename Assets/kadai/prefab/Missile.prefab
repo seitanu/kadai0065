@@ -123,8 +123,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 438add53e0d81c147b043d443c9bbbca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
   speed: 30
-  turnSpeed: 20
+  maxTurnAngle: 20
   lifetime: 5
-  hitThreshold: 1
+  target: {fileID: 0}

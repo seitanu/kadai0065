@@ -1,45 +1,59 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class MissileController : MonoBehaviour
 {
-    public Transform target;
-    public float speed = 30f;
-    public float turnSpeed = 20f; // degrees per second
+    public float speed = 20f;
+    public float maxTurnAngle = 20f;
     public float lifetime = 5f;
-    public float hitThreshold = 1.0f;
+
+    public Transform target;
+    private Vector3 currentDirection;
+    private float timer;
+
+    public void Initialize(Transform target, Vector3 spreadDirection)
+    {
+        this.target = target;
+        currentDirection = spreadDirection.normalized;
+        transform.forward = currentDirection;
+    }
 
     void Update()
     {
-        if (target == null)
+        if (target != null)
         {
-            Destroy(gameObject);
-            return;
+            Vector3 toTarget = (target.position - transform.position).normalized;
+            float angle = Vector3.Angle(currentDirection, toTarget);
+            if (angle > maxTurnAngle)
+            {
+                Vector3 axis = Vector3.Cross(currentDirection, toTarget);
+                currentDirection = Quaternion.AngleAxis(maxTurnAngle, axis) * currentDirection;
+            }
+            else
+            {
+                currentDirection = toTarget;
+            }
         }
 
-        Vector3 direction = target.position - transform.position;
-        direction.Normalize();
+        transform.position += currentDirection * speed * Time.deltaTime;
 
-        // ベクトル補正で方向を少しずつ変える（最大旋回角制限）
-        Vector3 currentDir = transform.forward;
-        float maxRadians = turnSpeed * Mathf.Deg2Rad * Time.deltaTime;
-        Vector3 newDir = Vector3.RotateTowards(currentDir, direction, maxRadians, 0f);
-        transform.rotation = Quaternion.LookRotation(newDir);
-
-        // 前進
-        transform.position += transform.forward * speed * Time.deltaTime;
-
-        // 命中判定
-        float dist = Vector3.Distance(transform.position, target.position);
-        if (dist < hitThreshold)
+        timer += Time.deltaTime;
+        if (timer > lifetime)
         {
-            target.SendMessage("OnHit", SendMessageOptions.DontRequireReceiver);
             Destroy(gameObject);
         }
+    }
 
-        // 寿命
-        lifetime -= Time.deltaTime;
-        if (lifetime <= 0f)
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Enemy"))
         {
+            EnemyReaction reaction = other.GetComponent<EnemyReaction>();
+            if (reaction != null)
+            {
+                reaction.OnHit();
+            }
+
             Destroy(gameObject);
         }
     }
